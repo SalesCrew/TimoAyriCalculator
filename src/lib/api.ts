@@ -1,10 +1,15 @@
-const fallbackApiBaseUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://timoayricalculator-backend-production.up.railway.app"
-    : "http://localhost:4000";
+const railwayApiBaseUrl =
+  "https://timoayricalculator-backend-production.up.railway.app";
+
+const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+const configuredApiUrlIsLocalhost =
+  configuredApiBaseUrl !== undefined &&
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredApiBaseUrl);
 
 const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? fallbackApiBaseUrl;
+  process.env.NODE_ENV === "production" && configuredApiUrlIsLocalhost
+    ? railwayApiBaseUrl
+    : (configuredApiBaseUrl ?? railwayApiBaseUrl);
 
 type ApiFetchOptions = {
   body?: unknown;
