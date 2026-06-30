@@ -118,6 +118,12 @@ type DashboardLeaderboardRow = {
   userId?: string;
 };
 
+type PodiumSlot = {
+  heightClassName: string;
+  rank: 1 | 2 | 3;
+  user?: DashboardLeaderboardRow;
+};
+
 type MeResponse = {
   user: {
     displayName: string;
@@ -245,7 +251,7 @@ export default function DashboardPage() {
   );
   const SelectedDrinkIcon = drink?.icon ?? GlassWater;
 
-  const podiumRows = useMemo(() => {
+  const podiumSlots = useMemo<PodiumSlot[]>(() => {
     const sorted = [...leaderboardRows].sort((first, second) => {
       if (first.rank !== second.rank) {
         return first.rank - second.rank;
@@ -253,8 +259,13 @@ export default function DashboardPage() {
 
       return second.pureAlcoholMl - first.pureAlcoholMl;
     });
+    const rowsByRank = new Map(sorted.map((row) => [row.rank, row]));
 
-    return [sorted[1], sorted[0], sorted[2]].filter(Boolean);
+    return [
+      { heightClassName: "h-16", rank: 2, user: rowsByRank.get(2) },
+      { heightClassName: "h-24", rank: 1, user: rowsByRank.get(1) },
+      { heightClassName: "h-12", rank: 3, user: rowsByRank.get(3) },
+    ];
   }, [leaderboardRows]);
 
   const currentAyri = useMemo(() => {
@@ -522,42 +533,62 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          {podiumRows.length > 0 ? (
-            <div className="grid grid-cols-3 items-end gap-2">
-              {podiumRows.map((user) => (
-                <div className="flex flex-col items-center gap-2" key={user.rank}>
-                  <div className="w-full rounded-lg bg-white p-2.5 text-center shadow-[0_14px_45px_rgba(15,23,42,0.05)] ring-1 ring-zinc-950/10">
+          <div className="grid grid-cols-3 items-end gap-2">
+            {podiumSlots.map((slot) => {
+              const user = slot.user;
+              const isPlaceholder = !user;
+
+              return (
+                <div className="flex flex-col items-center gap-2" key={slot.rank}>
+                  <div
+                    className={[
+                      "w-full rounded-lg p-2.5 text-center shadow-[0_14px_45px_rgba(15,23,42,0.05)] ring-1",
+                      isPlaceholder
+                        ? "border border-dashed border-zinc-200 bg-white/70 text-zinc-400 ring-zinc-950/5"
+                        : "bg-white ring-zinc-950/10",
+                    ].join(" ")}
+                  >
                     <div className="flex items-center justify-center gap-1 text-xs font-medium text-zinc-400">
-                      {user.rank === 1 && (
-                        <Crown className="size-3 text-sky-500" />
+                      {slot.rank === 1 && (
+                        <Crown
+                          className={[
+                            "size-3",
+                            isPlaceholder ? "text-zinc-300" : "text-sky-500",
+                          ].join(" ")}
+                        />
                       )}
-                      <span>#{user.rank}</span>
+                      <span>#{slot.rank}</span>
                     </div>
-                    <div className="truncate text-sm font-semibold">
-                      {user.displayName}
+                    <div
+                      className={[
+                        "truncate text-sm font-semibold",
+                        isPlaceholder ? "text-zinc-400" : "text-zinc-950",
+                      ].join(" ")}
+                    >
+                      {user?.displayName ?? "Noch offen"}
                     </div>
-                    <div className="font-mono text-[11px] text-sky-600">
-                      {user.pureAlcoholMl} ml
+                    <div
+                      className={[
+                        "font-mono text-[11px]",
+                        isPlaceholder ? "text-zinc-300" : "text-sky-600",
+                      ].join(" ")}
+                    >
+                      {user ? `${user.pureAlcoholMl} ml` : "--"}
                     </div>
                   </div>
                   <div
                     className={[
-                      "w-full rounded-t-lg bg-gradient-to-b from-sky-100 to-white ring-1 ring-sky-100",
-                      user.rank === 1
-                        ? "h-24"
-                        : user.rank === 2
-                          ? "h-16"
-                          : "h-12",
+                      "w-full rounded-t-lg ring-1",
+                      slot.heightClassName,
+                      isPlaceholder
+                        ? "bg-gradient-to-b from-zinc-50 to-white ring-zinc-100"
+                        : "bg-gradient-to-b from-sky-100 to-white ring-sky-100",
                     ].join(" ")}
                   />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg bg-white px-4 py-8 text-center text-sm text-zinc-500 shadow-[0_14px_45px_rgba(15,23,42,0.04)] ring-1 ring-zinc-950/10">
-              Noch keine Teilnehmerdaten.
-            </div>
-          )}
+              );
+            })}
+          </div>
         </section>
 
         <section
@@ -587,7 +618,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <Card className="rounded-lg border-0 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.06)] ring-1 ring-zinc-950/10">
+        <Card className="relative z-20 overflow-visible rounded-lg border-0 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.06)] ring-1 ring-zinc-950/10">
           <CardHeader className="gap-1 px-4 pt-4">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -635,7 +666,7 @@ export default function DashboardPage() {
                   </button>
 
                   {drinkMenuOpen && (
-                    <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-lg border border-zinc-100 bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.12)] ring-1 ring-zinc-950/5 backdrop-blur">
+                    <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-lg border border-zinc-100 bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.12)] ring-1 ring-zinc-950/5 backdrop-blur">
                       <div className="border-b border-zinc-100 p-2">
                         <div className="relative">
                           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
