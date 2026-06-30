@@ -161,12 +161,6 @@ function normalizeSearch(value: string) {
     .replace(/ß/g, "ss");
 }
 
-function getParticipantTotal(participant: ParticipantHistory) {
-  return Number(
-    participant.days.reduce((total, day) => total + day.ml, 0).toFixed(1),
-  );
-}
-
 function getCumulativePoints(days: ParticipantDay[]) {
   let total = 0;
 
@@ -180,184 +174,7 @@ function getCumulativePoints(days: ParticipantDay[]) {
   });
 }
 
-const drinkTypes = [
-  { name: "Märzen Bier", abv: 5.0, icon: Beer },
-  { name: "Lager", abv: 4.8, icon: Beer },
-  { name: "Pils", abv: 5.1, icon: Beer },
-  { name: "Radler", abv: 2.5, icon: GlassWater },
-  { name: "Weizenbier", abv: 5.4, icon: Beer },
-  { name: "Starkbier", abv: 7.5, icon: Beer },
-  { name: "Cider", abv: 4.5, icon: GlassWater },
-  { name: "Hard Seltzer", abv: 4.5, icon: GlassWater },
-  { name: "Weißwein", abv: 12.5, icon: BottleWine },
-  { name: "Rotwein", abv: 13.5, icon: BottleWine },
-  { name: "Rosé", abv: 12.0, icon: BottleWine },
-  { name: "Prosecco", abv: 11.0, icon: BottleWine },
-  { name: "Sekt", abv: 12.0, icon: BottleWine },
-  { name: "Champagner", abv: 12.0, icon: BottleWine },
-  { name: "Sangria", abv: 8.0, icon: BottleWine },
-  { name: "Aperol Spritz", abv: 8.0, icon: GlassWater },
-  { name: "Campari Spritz", abv: 8.5, icon: GlassWater },
-  { name: "Campari Soda", abv: 10.0, icon: GlassWater },
-  { name: "Hugo", abv: 6.5, icon: GlassWater },
-  { name: "Lillet Wild Berry", abv: 6.5, icon: GlassWater },
-  { name: "Bellini", abv: 7.0, icon: GlassWater },
-  { name: "Mimosa", abv: 6.0, icon: GlassWater },
-  { name: "Weißer Spritzer", abv: 6.0, icon: GlassWater },
-  { name: "Mojito", abv: 13.0, icon: GlassWater },
-  { name: "Caipirinha", abv: 20.0, icon: GlassWater },
-  { name: "Cuba Libre", abv: 12.0, icon: GlassWater },
-  { name: "Dark and Stormy", abv: 12.0, icon: GlassWater },
-  { name: "Gin Tonic", abv: 12.0, icon: GlassWater },
-  { name: "Whiskey Cola", abv: 12.0, icon: GlassWater },
-  { name: "Vodka Lemon", abv: 12.0, icon: GlassWater },
-  { name: "Vodka Cranberry", abv: 12.0, icon: GlassWater },
-  { name: "Long Island Iced Tea", abv: 22.0, icon: Flame },
-  { name: "Espresso Martini", abv: 18.0, icon: GlassWater },
-  { name: "Pornstar Martini", abv: 16.0, icon: GlassWater },
-  { name: "Martini", abv: 28.0, icon: GlassWater },
-  { name: "Negroni", abv: 24.0, icon: GlassWater },
-  { name: "Margarita", abv: 18.0, icon: GlassWater },
-  { name: "Paloma", abv: 12.0, icon: GlassWater },
-  { name: "Moscow Mule", abv: 12.0, icon: GlassWater },
-  { name: "Cosmopolitan", abv: 16.0, icon: GlassWater },
-  { name: "Daiquiri", abv: 18.0, icon: GlassWater },
-  { name: "Piña Colada", abv: 13.0, icon: GlassWater },
-  { name: "Sex on the Beach", abv: 12.0, icon: GlassWater },
-  { name: "Mai Tai", abv: 18.0, icon: GlassWater },
-  { name: "Tequila Sunrise", abv: 13.0, icon: GlassWater },
-  { name: "Amaretto Sour", abv: 14.0, icon: GlassWater },
-  { name: "Whiskey Sour", abv: 18.0, icon: GlassWater },
-  { name: "White Russian", abv: 16.0, icon: GlassWater },
-  { name: "Bloody Mary", abv: 10.0, icon: GlassWater },
-  { name: "French 75", abv: 14.0, icon: GlassWater },
-  { name: "Vodka", abv: 40.0, icon: Flame },
-  { name: "Gin", abv: 40.0, icon: Flame },
-  { name: "Rum", abv: 40.0, icon: Flame },
-  { name: "Tequila", abv: 38.0, icon: Flame },
-  { name: "Whiskey", abv: 40.0, icon: Flame },
-  { name: "Jägermeister", abv: 35.0, icon: Flame },
-  { name: "Jägerbomb", abv: 15.0, icon: Flame },
-  { name: "Fernet", abv: 39.0, icon: Flame },
-  { name: "Ouzo", abv: 38.0, icon: Flame },
-  { name: "Sambuca", abv: 38.0, icon: Flame },
-  { name: "Limoncello", abv: 30.0, icon: Flame },
-  { name: "Baileys", abv: 17.0, icon: GlassWater },
-  { name: "Malibu", abv: 21.0, icon: Flame },
-  { name: "Korn", abv: 32.0, icon: Flame },
-  { name: "Shot Mix", abv: 20.0, icon: Flame },
-  { name: "Energy Vodka Mix", abv: 10.0, icon: GlassWater },
-  { name: "Flying Hirsch", abv: 15.0, icon: Flame },
-].map((item, index) => ({
-  ...item,
-  id: `mock-${index + 1}`,
-})) satisfies DashboardDrink[];
-
 const volumeOptions = [250, 330, 500];
-
-const participantHistories: ParticipantHistory[] = [
-  {
-    name: "Timo",
-    lastDrink: "Märzen Bier",
-    days: [
-      { date: "21.06.", entries: 3, ml: 63 },
-      { date: "24.06.", entries: 4, ml: 70 },
-      { date: "29.06.", entries: 4, ml: 88 },
-      { date: "02.07.", entries: 5, ml: 105 },
-      { date: "06.07.", entries: 4, ml: 95 },
-    ],
-  },
-  {
-    name: "Luki",
-    lastDrink: "Vodka Lemon",
-    days: [
-      { date: "21.06.", entries: 2, ml: 48 },
-      { date: "23.06.", entries: 3, ml: 74 },
-      { date: "28.06.", entries: 4, ml: 92 },
-      { date: "03.07.", entries: 3, ml: 80 },
-      { date: "07.07.", entries: 4, ml: 90 },
-    ],
-  },
-  {
-    name: "Max",
-    lastDrink: "Gin",
-    days: [
-      { date: "22.06.", entries: 2, ml: 35 },
-      { date: "25.06.", entries: 3, ml: 61 },
-      { date: "29.06.", entries: 3, ml: 67 },
-      { date: "04.07.", entries: 4, ml: 76 },
-      { date: "08.07.", entries: 3, ml: 73 },
-    ],
-  },
-  {
-    name: "Jonas",
-    lastDrink: "Negroni",
-    days: [
-      { date: "22.06.", entries: 1, ml: 24 },
-      { date: "26.06.", entries: 2, ml: 42 },
-      { date: "30.06.", entries: 3, ml: 58 },
-      { date: "05.07.", entries: 3, ml: 63 },
-      { date: "09.07.", entries: 2, ml: 57 },
-    ],
-  },
-  {
-    name: "Emir",
-    lastDrink: "Whiskey Sour",
-    days: [
-      { date: "21.06.", entries: 2, ml: 31 },
-      { date: "27.06.", entries: 2, ml: 38 },
-      { date: "01.07.", entries: 2, ml: 45 },
-      { date: "06.07.", entries: 2, ml: 50 },
-      { date: "10.07.", entries: 2, ml: 42 },
-    ],
-  },
-  {
-    name: "Ben",
-    lastDrink: "Weißwein",
-    days: [
-      { date: "23.06.", entries: 1, ml: 18 },
-      { date: "25.06.", entries: 2, ml: 29 },
-      { date: "01.07.", entries: 2, ml: 41 },
-      { date: "04.07.", entries: 3, ml: 52 },
-      { date: "11.07.", entries: 2, ml: 42 },
-    ],
-  },
-  {
-    name: "Felix",
-    lastDrink: "Moscow Mule",
-    days: [
-      { date: "24.06.", entries: 1, ml: 12 },
-      { date: "28.06.", entries: 1, ml: 22 },
-      { date: "02.07.", entries: 2, ml: 31 },
-      { date: "07.07.", entries: 2, ml: 38 },
-      { date: "12.07.", entries: 2, ml: 35 },
-    ],
-  },
-  {
-    name: "Nico",
-    lastDrink: "Radler",
-    days: [
-      { date: "21.06.", entries: 1, ml: 10 },
-      { date: "26.06.", entries: 1, ml: 20 },
-      { date: "30.06.", entries: 1, ml: 24 },
-      { date: "05.07.", entries: 2, ml: 31 },
-      { date: "13.07.", entries: 2, ml: 31 },
-    ],
-  },
-];
-
-const leaderboard: LeaderboardPerson[] = participantHistories
-  .map((participant) => ({
-    ...participant,
-    pureAlcoholMl: getParticipantTotal(participant),
-  }))
-  .sort((first, second) => second.pureAlcoholMl - first.pureAlcoholMl)
-  .map((participant, index) => ({
-    ...participant,
-    rank: index + 1,
-  }));
-
-const ayri = leaderboard[leaderboard.length - 1]!;
 
 function getDrinkIcon(item: Pick<ApiDrinkType, "category" | "name">) {
   if (item.category === "beer") {
@@ -400,128 +217,33 @@ function mapApiEntry(entry: ApiDrinkEntry): DashboardSubmission {
   };
 }
 
-const initialSubmissions = [
-  {
-    person: "Timo",
-    drink: "Märzen Bier",
-    volume: 500,
-    units: 2,
-    alcohol: 50,
-    time: "21:42",
-  },
-  {
-    person: "Luki",
-    drink: "Aperol Spritz",
-    volume: 330,
-    units: 1,
-    alcohol: 26.4,
-    time: "21:31",
-  },
-  {
-    person: "Max",
-    drink: "Gin",
-    volume: 40,
-    units: 2,
-    alcohol: 32,
-    time: "21:18",
-  },
-  {
-    person: "Nico",
-    drink: "Radler",
-    volume: 500,
-    units: 1,
-    alcohol: 12.5,
-    time: "21:04",
-  },
-  {
-    person: "Timo",
-    drink: "Lager",
-    volume: 330,
-    units: 3,
-    alcohol: 47.5,
-    time: "20:52",
-  },
-  {
-    person: "Ben",
-    drink: "Weißwein",
-    volume: 125,
-    units: 2,
-    alcohol: 31.3,
-    time: "20:39",
-  },
-  {
-    person: "Luki",
-    drink: "Vodka",
-    volume: 40,
-    units: 1,
-    alcohol: 16,
-    time: "20:21",
-  },
-  {
-    person: "Max",
-    drink: "Märzen Bier",
-    volume: 500,
-    units: 1,
-    alcohol: 25,
-    time: "20:07",
-  },
-  {
-    person: "Nico",
-    drink: "Aperol Spritz",
-    volume: 250,
-    units: 1,
-    alcohol: 20,
-    time: "19:48",
-  },
-  {
-    person: "Ben",
-    drink: "Radler",
-    volume: 330,
-    units: 1,
-    alcohol: 8.3,
-    time: "19:35",
-  },
-];
-
 export default function DashboardPage() {
   const router = useRouter();
-  const [selectedDrink, setSelectedDrink] = useState(drinkTypes[0]!.name);
+  const [selectedDrink, setSelectedDrink] = useState("");
   const [drinkMenuOpen, setDrinkMenuOpen] = useState(false);
   const [drinkSearch, setDrinkSearch] = useState("");
   const [selectedVolume, setSelectedVolume] = useState(500);
   const [units, setUnits] = useState(1);
-  const [submissions, setSubmissions] =
-    useState<DashboardSubmission[]>(initialSubmissions);
-  const [drinkOptions, setDrinkOptions] =
-    useState<DashboardDrink[]>(drinkTypes);
+  const [submissions, setSubmissions] = useState<DashboardSubmission[]>([]);
+  const [drinkOptions, setDrinkOptions] = useState<DashboardDrink[]>([]);
   const [leaderboardRows, setLeaderboardRows] =
-    useState<DashboardLeaderboardRow[]>(
-      leaderboard.map((person) => ({
-        displayName: person.name,
-        lastDrink: person.lastDrink,
-        pureAlcoholMl: person.pureAlcoholMl,
-        rank: person.rank,
-      })),
-    );
+    useState<DashboardLeaderboardRow[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [participantsOpen, setParticipantsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [participantRows, setParticipantRows] =
-    useState<LeaderboardPerson[]>(leaderboard);
+    useState<LeaderboardPerson[]>([]);
   const [expandedParticipant, setExpandedParticipant] = useState<string | null>(
-    leaderboard[0]?.name ?? null,
+    null,
   );
   const drinkDropdownRef = useRef<HTMLDivElement>(null);
   const drinkSearchRef = useRef<HTMLInputElement>(null);
 
   const drink = useMemo(
-    () =>
-      drinkOptions.find((item) => item.name === selectedDrink) ??
-      drinkOptions[0] ??
-      drinkTypes[0]!,
+    () => drinkOptions.find((item) => item.name === selectedDrink),
     [drinkOptions, selectedDrink],
   );
-  const SelectedDrinkIcon = drink.icon;
+  const SelectedDrinkIcon = drink?.icon ?? GlassWater;
 
   const podiumRows = useMemo(() => {
     const sorted = [...leaderboardRows].sort((first, second) => {
@@ -539,12 +261,7 @@ export default function DashboardPage() {
     return (
       [...leaderboardRows].sort(
         (first, second) => first.pureAlcoholMl - second.pureAlcoholMl,
-      )[0] ?? {
-        displayName: ayri.name,
-        lastDrink: ayri.lastDrink,
-        pureAlcoholMl: ayri.pureAlcoholMl,
-        rank: leaderboardRows.length + 1,
-      }
+      )[0] ?? null
     );
   }, [leaderboardRows]);
 
@@ -561,8 +278,8 @@ export default function DashboardPage() {
   }, [drinkOptions, drinkSearch]);
 
   const pureAlcohol = useMemo(
-    () => selectedVolume * units * (drink.abv / 100),
-    [drink.abv, selectedVolume, units],
+    () => selectedVolume * units * ((drink?.abv ?? 0) / 100),
+    [drink?.abv, selectedVolume, units],
   );
 
   useEffect(() => {
@@ -607,6 +324,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadDashboard() {
       if (!hasSupabaseBrowserConfig()) {
+        toast.error("Frontend ist nicht live konfiguriert", {
+          description: "Supabase Env Vars fehlen.",
+        });
+        router.push("/");
         return;
       }
 
@@ -631,23 +352,21 @@ export default function DashboardPage() {
         const mappedDrinks = drinks.drinkTypes.map(mapApiDrinkType);
 
         setIsAdmin(me.user.role === "admin");
-        setDrinkOptions(mappedDrinks.length > 0 ? mappedDrinks : drinkTypes);
+        setDrinkOptions(mappedDrinks);
         setLeaderboardRows(board.leaderboard);
         setSubmissions(activity.activity.map(mapApiEntry));
 
-        if (mappedDrinks.length > 0) {
-          setSelectedDrink((current) =>
-            mappedDrinks.some((item) => item.name === current)
-              ? current
-              : mappedDrinks[0]!.name,
-          );
-        }
+        setSelectedDrink((current) =>
+          mappedDrinks.some((item) => item.name === current)
+            ? current
+            : mappedDrinks[0]?.name ?? "",
+        );
       } catch (error) {
         toast.error("Live-Daten konnten nicht geladen werden", {
           description:
             error instanceof Error
               ? error.message
-              : "Dashboard läuft gerade mit Mockdaten.",
+              : "Bitte Backend und Env Vars pruefen.",
         });
       }
     }
@@ -665,6 +384,8 @@ export default function DashboardPage() {
     const rowsWithIds = leaderboardRows.filter((row) => row.userId);
 
     if (rowsWithIds.length === 0) {
+      setParticipantRows([]);
+      setExpandedParticipant(null);
       return;
     }
 
@@ -697,7 +418,7 @@ export default function DashboardPage() {
     } catch (error) {
       toast.error("History konnte nicht geladen werden", {
         description:
-          error instanceof Error ? error.message : "Mock-Verlauf bleibt aktiv.",
+          error instanceof Error ? error.message : "Bitte spaeter erneut versuchen.",
       });
     }
   }
@@ -713,59 +434,43 @@ export default function DashboardPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (accessToken && drink.id && !drink.id.startsWith("mock-")) {
-      try {
-        const response = await apiFetch<DrinkEntryResponse>("/v1/drink-entries", {
-          body: {
-            drinkTypeId: drink.id,
-            units,
-            volumeMl: selectedVolume,
-          },
-          method: "POST",
-          token: accessToken,
-        });
-        const leaderboardResponse = await apiFetch<LeaderboardResponse>(
-          "/v1/leaderboard",
-          {
-            token: accessToken,
-          },
-        );
-
-        setSubmissions((current) =>
-          [mapApiEntry(response.entry), ...current].slice(0, 10),
-        );
-        setLeaderboardRows(leaderboardResponse.leaderboard);
-        toast.success("Drink submitted", {
-          description: `${units}x ${selectedVolume} ml ${drink.name}`,
-        });
-        return;
-      } catch (error) {
-        toast.error("Submit fehlgeschlagen", {
-          description:
-            error instanceof Error
-              ? error.message
-              : "Backend-Verbindung prüfen.",
-        });
-        return;
-      }
+    if (!accessToken || !drink?.id) {
+      toast.error("Submit nicht bereit", {
+        description: "Bitte warten, bis Live-Daten geladen sind.",
+      });
+      return;
     }
 
-    const entry = {
-      person: "Du",
-      drink: drink.name,
-      volume: selectedVolume,
-      units,
-      alcohol: Number(pureAlcohol.toFixed(1)),
-      time: new Intl.DateTimeFormat("de-AT", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date()),
-    };
+    try {
+      const response = await apiFetch<DrinkEntryResponse>("/v1/drink-entries", {
+        body: {
+          drinkTypeId: drink.id,
+          units,
+          volumeMl: selectedVolume,
+        },
+        method: "POST",
+        token: accessToken,
+      });
+      const leaderboardResponse = await apiFetch<LeaderboardResponse>(
+        "/v1/leaderboard",
+        {
+          token: accessToken,
+        },
+      );
 
-    setSubmissions((current) => [entry, ...current].slice(0, 10));
-    toast.success("Drink submitted", {
-      description: `${units}x ${selectedVolume} ml ${drink.name}`,
-    });
+      setSubmissions((current) =>
+        [mapApiEntry(response.entry), ...current].slice(0, 10),
+      );
+      setLeaderboardRows(leaderboardResponse.leaderboard);
+      toast.success("Drink submitted", {
+        description: `${units}x ${selectedVolume} ml ${drink.name}`,
+      });
+    } catch (error) {
+      toast.error("Submit fehlgeschlagen", {
+        description:
+          error instanceof Error ? error.message : "Backend-Verbindung pruefen.",
+      });
+    }
   }
 
   return (
@@ -807,6 +512,7 @@ export default function DashboardPage() {
             <Button
               aria-label="Alle Beteiligten und Verlauf öffnen"
               className="size-9 rounded-lg border border-sky-100 bg-white text-sky-500 shadow-sm hover:bg-sky-50 hover:text-sky-600 focus-visible:ring-2 focus-visible:ring-sky-100"
+              disabled={leaderboardRows.length === 0}
               onClick={openParticipants}
               size="icon"
               type="button"
@@ -816,36 +522,42 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 items-end gap-2">
-            {podiumRows.map((user) => (
-              <div className="flex flex-col items-center gap-2" key={user.rank}>
-                <div className="w-full rounded-lg bg-white p-2.5 text-center shadow-[0_14px_45px_rgba(15,23,42,0.05)] ring-1 ring-zinc-950/10">
-                  <div className="flex items-center justify-center gap-1 text-xs font-medium text-zinc-400">
-                    {user.rank === 1 && (
-                      <Crown className="size-3 text-sky-500" />
-                    )}
-                    <span>#{user.rank}</span>
+          {podiumRows.length > 0 ? (
+            <div className="grid grid-cols-3 items-end gap-2">
+              {podiumRows.map((user) => (
+                <div className="flex flex-col items-center gap-2" key={user.rank}>
+                  <div className="w-full rounded-lg bg-white p-2.5 text-center shadow-[0_14px_45px_rgba(15,23,42,0.05)] ring-1 ring-zinc-950/10">
+                    <div className="flex items-center justify-center gap-1 text-xs font-medium text-zinc-400">
+                      {user.rank === 1 && (
+                        <Crown className="size-3 text-sky-500" />
+                      )}
+                      <span>#{user.rank}</span>
+                    </div>
+                    <div className="truncate text-sm font-semibold">
+                      {user.displayName}
+                    </div>
+                    <div className="font-mono text-[11px] text-sky-600">
+                      {user.pureAlcoholMl} ml
+                    </div>
                   </div>
-                  <div className="truncate text-sm font-semibold">
-                    {user.displayName}
-                  </div>
-                  <div className="font-mono text-[11px] text-sky-600">
-                    {user.pureAlcoholMl} ml
-                  </div>
+                  <div
+                    className={[
+                      "w-full rounded-t-lg bg-gradient-to-b from-sky-100 to-white ring-1 ring-sky-100",
+                      user.rank === 1
+                        ? "h-24"
+                        : user.rank === 2
+                          ? "h-16"
+                          : "h-12",
+                    ].join(" ")}
+                  />
                 </div>
-                <div
-                  className={[
-                    "w-full rounded-t-lg bg-gradient-to-b from-sky-100 to-white ring-1 ring-sky-100",
-                    user.rank === 1
-                      ? "h-24"
-                      : user.rank === 2
-                        ? "h-16"
-                        : "h-12",
-                  ].join(" ")}
-                />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg bg-white px-4 py-8 text-center text-sm text-zinc-500 shadow-[0_14px_45px_rgba(15,23,42,0.04)] ring-1 ring-zinc-950/10">
+              Noch keine Teilnehmerdaten.
+            </div>
+          )}
         </section>
 
         <section
@@ -862,14 +574,14 @@ export default function DashboardPage() {
               </p>
               <div className="flex items-baseline justify-between gap-3">
                 <h2 className="truncate text-2xl font-semibold tracking-normal">
-                  {currentAyri.displayName}
+                  {currentAyri?.displayName ?? "Noch niemand"}
                 </h2>
                 <span className="font-mono text-sm text-red-600">
-                  {currentAyri.pureAlcoholMl} ml
+                  {currentAyri ? `${currentAyri.pureAlcoholMl} ml` : "0 ml"}
                 </span>
               </div>
               <p className="text-sm text-red-700/70">
-                Zuletzt gesehen mit {currentAyri.lastDrink ?? "keinem Drink"}.
+                Zuletzt gesehen mit {currentAyri?.lastDrink ?? "keinem Drink"}.
               </p>
             </div>
           </div>
@@ -898,6 +610,7 @@ export default function DashboardPage() {
                     aria-expanded={drinkMenuOpen}
                     aria-haspopup="listbox"
                     className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white px-3 text-left text-sm shadow-sm outline-none transition-all hover:border-zinc-300 hover:bg-zinc-50/40 focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-100"
+                    disabled={drinkOptions.length === 0}
                     id="drink-type"
                     onClick={toggleDrinkMenu}
                     type="button"
@@ -905,11 +618,13 @@ export default function DashboardPage() {
                     <span className="flex min-w-0 items-center gap-2">
                       <SelectedDrinkIcon className="size-4 shrink-0 text-zinc-400" />
                       <span className="truncate font-medium text-zinc-800">
-                        {drink.name}
+                        {drink?.name ?? "Drinks laden..."}
                       </span>
-                      <span className="shrink-0 font-mono text-xs text-zinc-400">
-                        {drink.abv.toFixed(1)}%
-                      </span>
+                      {drink && (
+                        <span className="shrink-0 font-mono text-xs text-zinc-400">
+                          {drink.abv.toFixed(1)}%
+                        </span>
+                      )}
                     </span>
                     <ChevronDown
                       className={[
@@ -1049,6 +764,7 @@ export default function DashboardPage() {
 
               <Button
                 className="h-11 w-full rounded-lg bg-zinc-950 text-white hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-sky-200"
+                disabled={!accessToken || !drink?.id}
                 type="submit"
               >
                 Submitten
@@ -1070,38 +786,44 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-lg bg-white shadow-[0_18px_60px_rgba(15,23,42,0.05)] ring-1 ring-zinc-950/10">
-            {submissions.map((entry, index) => {
-              const Icon =
-                drinkOptions.find((item) => item.name === entry.drink)?.icon ??
-                Beer;
+            {submissions.length > 0 ? (
+              submissions.map((entry, index) => {
+                const Icon =
+                  drinkOptions.find((item) => item.name === entry.drink)?.icon ??
+                  Beer;
 
-              return (
-                <div key={`${entry.person}-${entry.time}-${index}`}>
-                  <div className="flex items-center gap-3 p-3">
-                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 ring-1 ring-zinc-100">
-                      <Icon className="size-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        <span className="font-semibold">{entry.person}</span>{" "}
-                        submitted {entry.units}x {entry.volume} ml {entry.drink}
-                      </p>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
-                        <span className="font-mono">{entry.time}</span>
-                        <span>·</span>
-                        <span className="font-mono text-sky-600">
-                          {entry.alcohol.toFixed(1)} ml alk
-                        </span>
+                return (
+                  <div key={`${entry.person}-${entry.time}-${index}`}>
+                    <div className="flex items-center gap-3 p-3">
+                      <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 ring-1 ring-zinc-100">
+                        <Icon className="size-4" />
                       </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          <span className="font-semibold">{entry.person}</span>{" "}
+                          submitted {entry.units}x {entry.volume} ml {entry.drink}
+                        </p>
+                        <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+                          <span className="font-mono">{entry.time}</span>
+                          <span>/</span>
+                          <span className="font-mono text-sky-600">
+                            {entry.alcohol.toFixed(1)} ml alk
+                          </span>
+                        </div>
+                      </div>
+                      <UserRound className="size-4 shrink-0 text-zinc-300" />
                     </div>
-                    <UserRound className="size-4 shrink-0 text-zinc-300" />
+                    {index < submissions.length - 1 && (
+                      <Separator className="bg-zinc-100" />
+                    )}
                   </div>
-                  {index < submissions.length - 1 && (
-                    <Separator className="bg-zinc-100" />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="px-4 py-8 text-center text-sm text-zinc-500">
+                Noch keine Submissions.
+              </div>
+            )}
           </div>
         </section>
       </div>
@@ -1124,7 +846,8 @@ export default function DashboardPage() {
 
           <div className="max-h-[calc(100dvh-8.5rem)] overflow-y-auto p-3">
             <div className="space-y-2">
-              {participantRows.map((person) => {
+              {participantRows.length > 0 ? (
+                participantRows.map((person) => {
                 const isExpanded = expandedParticipant === person.name;
                 const cumulativePoints = getCumulativePoints(person.days);
 
@@ -1156,7 +879,7 @@ export default function DashboardPage() {
                           {person.name}
                         </span>
                         <span className="block truncate text-xs text-zinc-500">
-                          Letzter Drink: {person.lastDrink}
+                          Letzter Drink: {person.lastDrink ?? "noch keiner"}
                         </span>
                       </span>
                       <span className="text-right">
@@ -1221,7 +944,12 @@ export default function DashboardPage() {
                     )}
                   </div>
                 );
-              })}
+                })
+              ) : (
+                <div className="rounded-lg bg-zinc-50 px-4 py-8 text-center text-sm text-zinc-500 ring-1 ring-zinc-100">
+                  Noch keine Teilnehmer mit Submissions.
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
@@ -1231,6 +959,14 @@ export default function DashboardPage() {
 }
 
 function CumulativeLineChart({ points }: { points: CumulativePoint[] }) {
+  if (points.length === 0) {
+    return (
+      <div className="rounded-lg bg-white px-4 py-8 text-center text-sm text-zinc-500 ring-1 ring-zinc-100">
+        Noch kein Verlauf.
+      </div>
+    );
+  }
+
   const width = 320;
   const height = 150;
   const paddingX = 18;
