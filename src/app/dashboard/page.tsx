@@ -229,7 +229,7 @@ export default function DashboardPage() {
   const [drinkMenuOpen, setDrinkMenuOpen] = useState(false);
   const [drinkSearch, setDrinkSearch] = useState("");
   const [selectedVolume, setSelectedVolume] = useState(500);
-  const [units, setUnits] = useState(1);
+  const [units, setUnits] = useState("");
   const [submissions, setSubmissions] = useState<DashboardSubmission[]>([]);
   const [drinkOptions, setDrinkOptions] = useState<DashboardDrink[]>([]);
   const [leaderboardRows, setLeaderboardRows] =
@@ -288,9 +288,15 @@ export default function DashboardPage() {
     );
   }, [drinkOptions, drinkSearch]);
 
+  const parsedUnits = useMemo(() => Number.parseInt(units, 10), [units]);
+  const hasValidUnits = Number.isInteger(parsedUnits) && parsedUnits >= 1;
+
   const pureAlcohol = useMemo(
-    () => selectedVolume * units * ((drink?.abv ?? 0) / 100),
-    [drink?.abv, selectedVolume, units],
+    () =>
+      selectedVolume *
+      (hasValidUnits ? parsedUnits : 0) *
+      ((drink?.abv ?? 0) / 100),
+    [drink?.abv, hasValidUnits, parsedUnits, selectedVolume],
   );
 
   useEffect(() => {
@@ -445,9 +451,9 @@ export default function DashboardPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!accessToken || !drink?.id) {
+    if (!accessToken || !drink?.id || !hasValidUnits) {
       toast.error("Submit nicht bereit", {
-        description: "Bitte warten, bis Live-Daten geladen sind.",
+        description: "Bitte Drink laden und Units eintragen.",
       });
       return;
     }
@@ -456,7 +462,7 @@ export default function DashboardPage() {
       const response = await apiFetch<DrinkEntryResponse>("/v1/drink-entries", {
         body: {
           drinkTypeId: drink.id,
-          units,
+          units: parsedUnits,
           volumeMl: selectedVolume,
         },
         method: "POST",
@@ -474,7 +480,7 @@ export default function DashboardPage() {
       );
       setLeaderboardRows(leaderboardResponse.leaderboard);
       toast.success("Drink submitted", {
-        description: `${units}x ${selectedVolume} ml ${drink.name}`,
+        description: `${parsedUnits}x ${selectedVolume} ml ${drink.name}`,
       });
     } catch (error) {
       toast.error("Submit fehlgeschlagen", {
@@ -775,11 +781,12 @@ export default function DashboardPage() {
                   <Input
                     className="h-11 rounded-lg border-zinc-200 bg-white text-sm shadow-sm focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-100"
                     id="drink-units"
-                    min={1}
                     onChange={(event) =>
-                      setUnits(Math.max(1, Number(event.target.value) || 1))
+                      setUnits(event.target.value.replace(/\D/g, ""))
                     }
-                    type="number"
+                    inputMode="numeric"
+                    placeholder="Units"
+                    type="text"
                     value={units}
                   />
                 </div>
@@ -795,7 +802,7 @@ export default function DashboardPage() {
 
               <Button
                 className="h-11 w-full rounded-lg bg-zinc-950 text-white hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-sky-200"
-                disabled={!accessToken || !drink?.id}
+                disabled={!accessToken || !drink?.id || !hasValidUnits}
                 type="submit"
               >
                 Submitten
