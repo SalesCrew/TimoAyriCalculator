@@ -2,12 +2,9 @@ const railwayApiBaseUrl =
   "https://timoayricalculator-backend-production.up.railway.app";
 
 const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
-const configuredApiUrlIsLocalhost =
-  configuredApiBaseUrl !== undefined &&
-  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredApiBaseUrl);
 
 const apiBaseUrl =
-  process.env.NODE_ENV === "production" && configuredApiUrlIsLocalhost
+  process.env.NODE_ENV === "production"
     ? railwayApiBaseUrl
     : (configuredApiBaseUrl ?? railwayApiBaseUrl);
 
