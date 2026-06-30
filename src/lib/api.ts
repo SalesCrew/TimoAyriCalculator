@@ -1,6 +1,10 @@
+const fallbackApiBaseUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://timoayricalculator-backend-production.up.railway.app"
+    : "http://localhost:4000";
+
 const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "http://localhost:4000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? fallbackApiBaseUrl;
 
 type ApiFetchOptions = {
   body?: unknown;
